@@ -1,16 +1,20 @@
 name: gdgdoc
 description: "A new Flutter project."
-publish_to: 'none'
+publish_to: "none"
 version: 0.1.0
 
 environment:
   sdk: ^3.7.2
 
 dependencies:
+  cached_network_image: ^3.4.1
   flutter:
     sdk: flutter
   flutter_platform_widgets: ^8.0.0
+  flutter_riverpod: ^2.6.1
+  flutter_svg: ^2.0.17
   google_maps_flutter: ^2.12.1
+  shimmer: ^3.0.0
 
 dev_dependencies:
   flutter_test:
