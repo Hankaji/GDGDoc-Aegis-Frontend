@@ -82,7 +82,7 @@ class _MapImageScreenState extends State<MapImageScreen> {
                   if (_pinPosition != null && _currentState == MapState.browsing)
                     Positioned(
                       left: _pinPosition!.dx - 20,
-                      top: _pinPosition!.dy - 42,
+                      top: _pinPosition!.dy - 52,
                       child: const MapPinIcon(size: 50),
                     ),
                   // Search result pins

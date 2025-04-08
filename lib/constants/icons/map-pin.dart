@@ -24,7 +24,7 @@ class MapPinIcon extends StatelessWidget {
       children: [
         // The shadow (positioned at bottom) 
         Transform.translate(
-          offset: Offset(-size*0.1,0), // Slight vertical offset
+          offset: Offset(0,0), // Slight vertical offset
           child: Container(
             width: size * shadowSpread,
             height: size * 0.1,
