@@ -35,7 +35,7 @@ class MainApp extends StatelessWidget {
                     DefaultCupertinoLocalizations.delegate,
                   ],
                   title: 'Aegis',
-                  home: Login(),
+                  home: Splashscreen(),
                   // home: Splashscreen(),
                 ),
           ),

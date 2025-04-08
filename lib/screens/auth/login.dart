@@ -1,27 +1,26 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:simple_gradient_text/simple_gradient_text.dart';
 
 class Login extends StatelessWidget {
+  const Login({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
         color: Colors.white,
         child: Padding(
-          padding: EdgeInsets.all(12),
+          padding: EdgeInsets.all(32),
           child: Center(
-            child: Wrap(
-              alignment: WrapAlignment.center,
-              runAlignment: WrapAlignment.center,
-              crossAxisAlignment: WrapCrossAlignment.center,
-              direction: Axis.vertical,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               spacing: 12,
               children: [
                 ..._welcomeText(),
                 _inputs(),
-                SizedBox(height: 64), // TODO: Change according to screen size?
+                SizedBox(height: 32), // TODO: Change according to screen size?
                 ..._alternativeLogin(),
               ],
             ),
@@ -35,80 +34,100 @@ class Login extends StatelessWidget {
 Widget _inputs() {
   return Padding(
     padding: EdgeInsets.symmetric(vertical: 16),
-    child: Wrap(
-      direction: Axis.vertical,
+    child: Column(
       spacing: 32,
-      crossAxisAlignment: WrapCrossAlignment.center,
       children: [
         // Inputs
-        Wrap(
-          direction: Axis.vertical,
+        Column(
           spacing: 12,
           children: [
-            SizedBox(
-              width: 500,
-              child: TextField(
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  hintText: "Email",
+            TextField(
+              decoration: InputDecoration(
+                filled: true,
+                fillColor: Color(0xFFF1F4FF),
+                border: OutlineInputBorder(
+                  borderSide: BorderSide.none,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                hintText: "Email",
+                hintStyle: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF626262),
                 ),
               ),
             ),
-            SizedBox(
-              width: 500,
-              child: TextField(
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  hintText: "Password",
+            TextField(
+              decoration: InputDecoration(
+                filled: true,
+                fillColor: Color(0xFFF1F4FF),
+                border: OutlineInputBorder(
+                  borderSide: BorderSide.none,
+                  borderRadius: BorderRadius.circular(12),
                 ),
-              ),
-            ),
-            SizedBox(
-              width: 500,
-              child: TextField(
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  hintText: "Confirm password",
+                hintText: "Password",
+                hintStyle: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF626262),
                 ),
               ),
             ),
           ],
         ),
-        // Action
+        // Action button
         Container(
-          width: 500,
-          padding: EdgeInsets.all(12),
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Color(0xFF6E71F5), Color(0xFF6E178B), Color(0xFF7C418F)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Color(0xFFCBD6FF),
+                offset: Offset(0, 8),
+                blurRadius: 16,
+              ),
+            ],
           ),
-          child: Text(
-            "Sign up",
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-          ),
-        ),
-        SizedBox(
-          width: 500,
-          child: TextField(
-            decoration: InputDecoration(
-              filled: true,
-              fillColor: Colors.transparent,
-              border: OutlineInputBorder(
-                borderSide: BorderSide.none,
+          child: Material(
+            type: MaterialType.transparency,
+            clipBehavior: Clip.none,
+            child: Ink(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Color(0xFF6E71F5),
+                    Color(0xFF6E178B),
+                    Color(0xFF7C418F),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
                 borderRadius: BorderRadius.circular(12),
               ),
-              hintText: "Sign up",
+              child: InkWell(
+                onTap: () => debugPrint("Change to map page"),
+                borderRadius: BorderRadius.circular(12),
+                child: Container(
+                  padding: EdgeInsets.all(12),
+                  alignment: Alignment.center,
+                  child: Text(
+                    "Log in",
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
             ),
           ),
         ),
         // Already have an account text
         Text(
-          "Already had an account?",
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          "Not a member?",
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF1F41BB),
+          ),
+
           textAlign: TextAlign.center,
         ),
       ],
@@ -122,7 +141,7 @@ List<Widget> _welcomeText() {
       "Get verified instantly",
       colors: [Color(0xFFFF63F0), Color(0xFFC82DB9), Color(0xFF7220FF)],
       gradientDirection: GradientDirection.ltr,
-      style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+      style: GoogleFonts.poppins(fontSize: 32, fontWeight: FontWeight.bold),
       textAlign: TextAlign.center,
     ),
     Text(
@@ -140,8 +159,9 @@ List<Widget> _alternativeLogin() {
       style: TextStyle(fontSize: 12),
       textAlign: TextAlign.center,
     ),
-    Wrap(
+    Row(
       spacing: 12,
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Container(
           width: 50,
@@ -150,13 +170,11 @@ List<Widget> _alternativeLogin() {
             borderRadius: BorderRadius.circular(12),
             color: Color(0xFFECECEC),
           ),
-        ),
-        Container(
-          width: 50,
-          height: 40,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            color: Color(0xFFECECEC),
+          child: SvgPicture.asset(
+            'assets/icons/google-fill.svg',
+            fit: BoxFit.scaleDown,
+            width: 24,
+            height: 24,
           ),
         ),
         Container(
@@ -165,6 +183,26 @@ List<Widget> _alternativeLogin() {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
             color: Color(0xFFECECEC),
+          ),
+          child: SvgPicture.asset(
+            'assets/icons/facebook-fill.svg',
+            fit: BoxFit.scaleDown,
+            width: 24,
+            height: 24,
+          ),
+        ),
+        Container(
+          width: 50,
+          height: 40,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            color: Color(0xFFECECEC),
+          ),
+          child: SvgPicture.asset(
+            'assets/icons/apple-fill.svg',
+            fit: BoxFit.scaleDown,
+            width: 24,
+            height: 24,
           ),
         ),
       ],

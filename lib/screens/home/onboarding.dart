@@ -4,6 +4,7 @@ import 'package:blobs/blobs.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:gdgdoc/screens/auth/login.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:simple_animations/simple_animations.dart';
 
@@ -171,7 +172,15 @@ class _OnboardingState extends State<Onboarding> {
                             color: Color(0xFF383F51),
                             padding: EdgeInsets.symmetric(vertical: 16),
                             // TODO: Move to register
-                            onPressed: () {},
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                platformPageRoute(
+                                  context: context,
+                                  builder: (context) => const Login(),
+                                ),
+                              );
+                            },
                             child: Text(
                               "Join now".toUpperCase(),
                               style: TextStyle(
