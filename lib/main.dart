@@ -1,8 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:gdgdoc/screens/home/intro.dart';
-import 'package:gdgdoc/screens/home/newcomer.dart';
+import 'package:gdgdoc/screens/home/splashscreen.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 void main() {
@@ -35,17 +34,9 @@ class MainApp extends StatelessWidget {
                     DefaultCupertinoLocalizations.delegate,
                   ],
                   title: 'Aegis',
-                  home: Intro(),
+                  home: Splashscreen(),
                 ),
           ),
     );
-
-    // return const MaterialApp(
-    //   title: "Aegis",
-    //   home: Scaffold(
-    //     body: Center(child: Text('Hello World!')),
-    //     backgroundColor: Color(0xFFFF3080),
-    //   ),
-    // );
   }
 }
