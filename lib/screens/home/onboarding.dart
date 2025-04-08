@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:blobs/blobs.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -20,6 +21,7 @@ class _OnboardingState extends State<Onboarding> {
   @override
   Widget build(BuildContext context) {
     return PlatformScaffold(
+      backgroundColor: Colors.white,
       body: Stack(
         alignment: AlignmentDirectional.center,
         children: [
