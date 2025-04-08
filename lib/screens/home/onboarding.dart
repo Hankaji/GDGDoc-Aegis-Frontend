@@ -3,18 +3,17 @@ import 'dart:ui';
 import 'package:blobs/blobs.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:simple_animations/simple_animations.dart';
 
-class Newcomer extends StatefulWidget {
-  const Newcomer({super.key});
+class Onboarding extends StatefulWidget {
+  const Onboarding({super.key});
 
   @override
-  State<Newcomer> createState() => _NewcomerState();
+  State<Onboarding> createState() => _OnboardingState();
 }
 
-class _NewcomerState extends State<Newcomer> {
+class _OnboardingState extends State<Onboarding> {
   // final curveType = Curves.easeOutBack;
   var curveType = Curves.easeOutQuart;
 
