@@ -28,4 +28,8 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
-    - assets/
+  - assets/
+  - assets/icons/
+  # - assets/icons/google-fill.svg
+  # - assets/icons/facebook-fill.svg
+  # - assets/icons/apple-fill.svg
