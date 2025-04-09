@@ -7,7 +7,6 @@ class MapPinIcon extends StatelessWidget {
   final Color shadowColor;
   final double shadowHeight;
   final double shadowSpread;
-
   const MapPinIcon({
     super.key,
     this.size = 24,
