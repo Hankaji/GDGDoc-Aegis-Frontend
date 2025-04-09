@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:gdgdoc/screens/home/components/avatar.dart';
 import 'package:gdgdoc/screens/home/components/comment.dart';
 import 'package:google_fonts/google_fonts.dart';
