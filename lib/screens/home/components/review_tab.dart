@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:gdgdoc/screens/home/components/avatar.dart';
+import 'package:gdgdoc/screens/home/components/comment.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:percent_indicator/flutter_percent_indicator.dart';
 
@@ -10,7 +12,9 @@ class QuickTest extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Padding(padding: EdgeInsets.all(24), child: ReviewTab()),
+      body: SingleChildScrollView(
+        child: Padding(padding: EdgeInsets.all(24), child: ReviewTab()),
+      ),
     );
   }
 }
@@ -73,22 +77,6 @@ Widget _starRating() {
   return IntrinsicHeight(child: Row(children: [currRating(), ratingCount()]));
 }
 
-Container avatar(String imgUrl) {
-  return Container(
-    decoration: BoxDecoration(
-      shape: BoxShape.circle,
-      boxShadow: [
-        BoxShadow(
-          color: Colors.black.withValues(alpha: 0.25),
-          offset: Offset(0, 4),
-          blurRadius: 4,
-        ),
-      ],
-    ),
-    child: CircleAvatar(backgroundImage: NetworkImage(imgUrl), radius: 18),
-  );
-}
-
 Widget _rateAndReview() {
   Column text() {
     return Column(
@@ -110,7 +98,7 @@ Widget _rateAndReview() {
     return Row(
       spacing: 8,
       children: [
-        avatar(
+        Avatar(
           'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR973CvBiARVYpqXyzxOtN4ocLgBXIfEqQqph66ap8YPMOIblPqyFVnp8EbYGzsjibt7sY&usqp=CAU',
         ),
         Icon(Icons.star_rate_rounded, color: Color(0xFFFFB53F), size: 32),
@@ -187,133 +175,86 @@ Widget _rateAndReview() {
   );
 }
 
-Widget comment(
-  String imgUrl,
-  String name,
-  int auras,
-  int rating,
-  List<Widget>? replies,
-) {
-  Row comment_name_info() {
-    return Row(
-      spacing: 4,
-      children: [
-        Text(name, style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
-        Text("·", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
-        Text("$auras Auras", style: TextStyle(fontSize: 12)),
-      ],
-    );
-  }
-
-  Row comment_rating_info() {
-    return Row(
-      spacing: 4,
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Row(
-          children: [
-            Text(
-              rating.toString(),
-              style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
-            ),
-            Transform.translate(
-              offset: Offset(0, -1),
-              child: Icon(
-                Icons.star_rate_rounded,
-                color: Color(0xFFFFB53F),
-                size: 16,
-              ),
-            ),
-          ],
-        ),
-        Text("·", style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
-        Text("5 days ago", style: TextStyle(fontSize: 10)),
-      ],
-    );
-  }
-
-  Row actions() {
-    return Row(
-      spacing: 12,
-      children: [
-        Row(
-          children: [
-            Icon(Icons.arrow_drop_up, size: 24),
-            Text("228922", style: TextStyle(fontSize: 10)),
-            Icon(Icons.arrow_drop_down, size: 24),
-          ],
-        ),
-        Row(
-          children: [
-            Icon(Icons.reply_rounded, size: 20),
-            Text("Reply", style: TextStyle(fontSize: 10)),
-          ],
-        ),
-        Icon(Icons.more_horiz_rounded, color: Color(0xFFCFCFCF), size: 20),
-      ],
-    );
-  }
-
-  // List<Widget> replies = [];
-
-  return Row(
-    spacing: 12,
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      avatar(imgUrl),
-      Expanded(
-        child: Column(
-          spacing: 12,
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [comment_name_info(), comment_rating_info()],
-                ),
-                Spacer(),
-                Icon(
-                  Icons.more_vert_rounded,
-                  color: Color(0xFFCFCFCF),
-                  size: 20,
-                ),
-              ],
-            ),
-            Text(
-              "This place is Absolute cinema, i can never get bored going to this place.",
-              style: TextStyle(fontSize: 10),
-            ),
-            actions(),
-
-            if (replies != null) ...replies,
-          ],
-        ),
-      ),
-    ],
-  );
-}
-
 Widget _commentSection() {
   return Column(
     children: [
-      comment(
-        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTk28Z1v9WxfA6LVlxgeLy68jJfeAdScD0TUA&s',
-        "HandsomeMan",
-        4872,
-        3,
-        [
-          comment(
+      Comment(
+        imgUrl:
             'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTk28Z1v9WxfA6LVlxgeLy68jJfeAdScD0TUA&s',
-            "SwordSlasher2306",
-            997,
-            -1,
-            null,
+        name: 'HandsomeChineseMan',
+        comment:
+            "This place is Absolute cinema, i can never get bored going to this place.",
+        time: "5 days",
+        rating: 5,
+        auras: 4872,
+        votes: 228922,
+      ),
+      Comment(
+        imgUrl:
+            'https://dragonball.guru/wp-content/uploads/2021/03/vegeta-profile-400x400.png',
+        name: 'SwordSlasher',
+        comment: "His shlong is bigger than mine.",
+        time: "3 weeks",
+        rating: 3,
+        auras: 127,
+        votes: 316791,
+        replies: [
+          Comment(
+            imgUrl:
+                'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQnlMh-VQdsdzvvOJQPDHiQEsFGI7_pM_doLg&s',
+            name: 'SwordSlasher2306',
+            comment: "Skill issue",
+            time: "3 weeks",
+            isReply: true,
+            rating: 3,
+            auras: 997,
+            votes: 1864,
+          ),
+          Comment(
+            imgUrl:
+                'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRlv1uEukVNvXSKnZxP7yfbQt2RTqCY7hhoTA&s',
+            name: 'BihAhDih',
+            comment: "Ur jealous lol",
+            time: "3 weeks",
+            isReply: true,
+            rating: 3,
+            auras: 156,
+            votes: 78,
           ),
         ],
+      ),
+      Comment(
+        imgUrl:
+            'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ-7GrrTHrY7rCTNuz97ZoGTX3W-ZNCMsZxow&s',
+        name: 'Creeper2012',
+        comment: "2024 anyone?",
+        time: "a year",
+        rating: 1,
+        auras: 8,
+        votes: 23,
+        replies: [
+          Comment(
+            imgUrl:
+                'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRlv1uEukVNvXSKnZxP7yfbQt2RTqCY7hhoTA&s',
+            name: 'BihAhDih',
+            comment: "Shut up bro",
+            time: "2 years",
+            isReply: true,
+            rating: -1,
+            auras: 156,
+            votes: -210,
+          ),
+        ],
+      ),
+      Comment(
+        imgUrl:
+            'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTpmNskM4AGEpg1iIVAQ_n9nF_KaHJjgiuHiA&s',
+        name: 'RealGoku',
+        comment: "It's fun being here.",
+        time: "a week",
+        rating: 5,
+        auras: 999999,
+        votes: 702569786109124,
       ),
     ],
   );
