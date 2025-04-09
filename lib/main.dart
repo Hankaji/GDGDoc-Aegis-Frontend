@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:gdgdoc/screens/auth/login.dart';
+import 'package:gdgdoc/screens/home/components/review_tab.dart';
 import 'package:gdgdoc/screens/home/splashscreen.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -35,7 +36,7 @@ class MainApp extends StatelessWidget {
                     DefaultCupertinoLocalizations.delegate,
                   ],
                   title: 'Aegis',
-                  home: Splashscreen(),
+                  home: QuickTest(),
                   // home: Splashscreen(),
                 ),
           ),
