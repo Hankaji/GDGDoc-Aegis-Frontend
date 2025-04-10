@@ -20,7 +20,7 @@ class Login extends StatelessWidget {
               children: [
                 ..._welcomeText(),
                 _inputs(),
-                SizedBox(height: 32), // TODO: Change according to screen size?
+                SizedBox(height: 32),
                 ..._alternativeLogin(),
               ],
             ),
