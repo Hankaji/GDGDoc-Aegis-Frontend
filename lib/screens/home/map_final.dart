@@ -1,44 +1,63 @@
 import 'package:faker/faker.dart' hide Image, Color;
 import 'package:flutter/material.dart';
 import 'package:smooth_sheets/smooth_sheets.dart';
+import 'package:anim_search_bar/anim_search_bar.dart';
 
 class Home extends StatelessWidget {
   const Home({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // Cache the system UI insets outside of the scaffold for later use.
-    // This is because the scaffold adds the height of the navigation bar
-    // to the padding.bottom of the inherited MediaQuery and re-exposes it
-    // to the descendant widgets. Therefore, the descendant widgets cannot get
-    // the net system UI insets.
     final systemUiInsets = MediaQuery.of(context).padding;
 
     final result = Scaffold(
-      // Enable this flag since the navigation bar
-      // will be hidden when the sheet is dragged down.
       extendBody: true,
-      // Enable this flag since we want the sheet handle to be drawn
-      // behind the tab bar when the sheet is fully expanded.
       extendBodyBehindAppBar: true,
-      appBar: const _AppBar(),
       body: Stack(
-        children: [const _Map(), _ContentSheet(systemUiInsets: systemUiInsets)],
+        children: [
+          const _Map(),
+          _ContentSheet(systemUiInsets: systemUiInsets),
+          Positioned(top: 0, left: 16, right: 16, child: _SearchBar()),
+        ],
       ),
       bottomNavigationBar: const _BottomNavigationBar(),
       floatingActionButton: const _MapButton(),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
 
-    return DefaultTabController(
-      length: _AppBar.tabs.length,
-      // Provides a SheetController to the descendant widgets
-      // to perform some sheet position driven animations.
-      // The sheet will look up and use this controller unless
-      // another one is manually specified in the constructor.
-      // The descendant widgets can also get this controller by
-      // calling 'DefaultSheetController.of(context)'.
-      child: DefaultSheetController(child: result),
+    return DefaultSheetController(child: result);
+  }
+}
+
+class _SearchBar extends StatefulWidget {
+  @override
+  _AppState createState() => _AppState();
+}
+
+class _AppState extends State<_SearchBar> {
+  TextEditingController textController = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 50.0, right: 10, left: 10),
+
+      /// In AnimSearchBar widget, the width, textController, onSuffixTap are required properties.
+      /// You have also control over the suffixIcon, prefixIcon, helpText and animationDurationInMilli
+      child: AnimSearchBar(
+        onSubmitted: (String query) async {
+          // Simulate API call
+          await Future.delayed(const Duration(seconds: 1));
+          print(query);
+        },
+        width: 400,
+        textController: textController,
+        onSuffixTap: () {
+          setState(() {
+            textController.clear();
+          });
+        },
+      ),
     );
   }
 }
@@ -95,40 +114,44 @@ class _Map extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      bottom: false,
-      child: SizedBox.expand(
-        child: InteractiveViewer(
-          panEnabled: true,
-          scaleEnabled: true,
-          constrained: false,
-          minScale: 0.5,
-          maxScale: 4,
-          child: Stack(
-            fit: StackFit.passthrough,
-            children: [Image.asset('assets/fake_map.png', fit: BoxFit.contain)],
-          ),
+    return SizedBox.expand(
+      child: InteractiveViewer(
+        panEnabled: true,
+        scaleEnabled: true,
+        constrained: false,
+        minScale: 0.5,
+        maxScale: 4,
+        child: Stack(
+          fit: StackFit.passthrough,
+          children: [Image.asset('assets/fake_map.png', fit: BoxFit.contain)],
         ),
       ),
     );
   }
 }
 
-class _ContentSheet extends StatelessWidget {
+class _ContentSheet extends StatefulWidget {
   const _ContentSheet({required this.systemUiInsets});
 
   final EdgeInsets systemUiInsets;
+
+  @override
+  State<_ContentSheet> createState() => _ContentSheetState();
+}
+
+class _ContentSheetState extends State<_ContentSheet> {
+  _House? _selectedHouse;
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
         final parentHeight = constraints.maxHeight;
-        final appbarHeight = MediaQuery.of(context).padding.top;
+        final appbarHeight = 220;
         final handleHeight = const _ContentSheetHandle().preferredSize.height;
         final sheetHeight = parentHeight - appbarHeight + handleHeight;
         final minSheetOffset = SheetOffset.absolute(
-          handleHeight + systemUiInsets.bottom,
+          handleHeight + widget.systemUiInsets.bottom,
         );
 
         return SheetViewport(
@@ -145,10 +168,24 @@ class _ContentSheet extends StatelessWidget {
             ),
             child: SizedBox(
               height: sheetHeight,
-              child: const Column(
+              child: Column(
                 children: [
-                  _ContentSheetHandle(),
-                  Expanded(child: _HouseList()),
+                  const _ContentSheetHandle(), // Your original handle
+                  Expanded(
+                    child:
+                        _selectedHouse == null
+                            ? _HouseList(
+                              onHouseSelected:
+                                  (house) =>
+                                      setState(() => _selectedHouse = house),
+                            )
+                            : _HouseDetailView(
+                              house: _selectedHouse!,
+                              onBackPressed:
+                                  () => setState(() => _selectedHouse = null),
+                            ),
+                  ),
+                  const SizedBox(height: 125), // Extra space at bottom
                 ],
               ),
             ),
@@ -159,6 +196,7 @@ class _ContentSheet extends StatelessWidget {
   }
 }
 
+// Modified handle to include back button when in detail view
 class _ContentSheetHandle extends StatelessWidget
     implements PreferredSizeWidget {
   const _ContentSheetHandle();
@@ -175,13 +213,20 @@ class _ContentSheetHandle extends StatelessWidget
         child: Column(
           mainAxisSize: MainAxisSize.max,
           children: [
-            buildIndicator(),
-            const SizedBox(height: 16),
+            Container(
+              height: 6,
+              width: 40,
+              decoration: const ShapeDecoration(
+                color: Colors.black12,
+                shape: StadiumBorder(),
+              ),
+            ),
+            const SizedBox(height: 13),
             Expanded(
               child: Center(
                 child: Text(
-                  '646 national park homes',
-                  style: Theme.of(context).textTheme.labelLarge,
+                  'Places Near You',
+                  style: Theme.of(context).textTheme.headlineSmall,
                 ),
               ),
             ),
@@ -190,21 +235,12 @@ class _ContentSheetHandle extends StatelessWidget
       ),
     );
   }
-
-  Widget buildIndicator() {
-    return Container(
-      height: 6,
-      width: 40,
-      decoration: const ShapeDecoration(
-        color: Colors.black12,
-        shape: StadiumBorder(),
-      ),
-    );
-  }
 }
 
 class _HouseList extends StatelessWidget {
-  const _HouseList();
+  const _HouseList({required this.onHouseSelected});
+
+  final ValueChanged<_House> onHouseSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -212,17 +248,97 @@ class _HouseList extends StatelessWidget {
       padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
       itemCount: _houses.length,
       itemBuilder: (context, index) {
-        return _HouseCard(_houses[index]);
+        return GestureDetector(
+          onTap: () => onHouseSelected(_houses[index]),
+          child: _HouseCard(_houses[index]),
+        );
       },
     );
 
-    // Hide the list when the sheet is dragged down.
     return FadeTransition(
       opacity: SheetOffsetDrivenAnimation(
         controller: DefaultSheetController.of(context),
         initialValue: 1,
       ).drive(CurveTween(curve: Curves.easeOutCubic)),
       child: result,
+    );
+  }
+}
+
+class _HouseDetailView extends StatelessWidget {
+  const _HouseDetailView({required this.house, required this.onBackPressed});
+
+  final _House house;
+  final VoidCallback onBackPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        // Keep the back button row fixed at the top
+        Row(
+          children: [
+            IconButton(
+              icon: const Icon(Icons.arrow_back),
+              onPressed: onBackPressed,
+            ),
+            const Spacer(),
+          ],
+        ),
+        // Make only the content area scrollable
+        Expanded(
+          child: SingleChildScrollView(
+            physics: const ClampingScrollPhysics(), // Better for sheet behavior
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // House image
+                Container(
+                  clipBehavior: Clip.antiAlias,
+                  decoration: ShapeDecoration(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                  ),
+                  child: AspectRatio(
+                    aspectRatio: 1.2,
+                    child: Image.network(house.image, fit: BoxFit.cover),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                // House details
+                Text(
+                  house.title,
+                  style: Theme.of(context).textTheme.headlineSmall,
+                ),
+                const SizedBox(height: 8),
+                Text('${house.distance} kilometers away'),
+                const SizedBox(height: 8),
+                Text(
+                  '\$${house.charge} total before taxes',
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 24),
+                // Map section
+                const Text('Map', style: TextStyle(fontSize: 18)),
+                const SizedBox(height: 8),
+                Container(
+                  height: 150,
+                  width: MediaQuery.sizeOf(context).width,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    color: Colors.grey[200],
+                  ),
+                  child: const Icon(Icons.map, size: 50),
+                ),
+                // Add any additional content here
+                const SizedBox(height: 175), // Extra space at bottom
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -253,114 +369,6 @@ class _House {
   final String image;
 }
 
-class _AppBar extends StatelessWidget implements PreferredSizeWidget {
-  const _AppBar();
-
-  static const tabs = [
-    Tab(text: 'National parks', icon: Icon(Icons.forest_outlined)),
-    Tab(text: 'Tiny homes', icon: Icon(Icons.cabin_outlined)),
-    Tab(text: 'Ryokan', icon: Icon(Icons.hotel_outlined)),
-    Tab(text: 'Play', icon: Icon(Icons.celebration_outlined)),
-  ];
-
-  static const topHeight = 80.0;
-
-  // The tab bar height is defined in:
-  // https://github.com/flutter/flutter/blob/78666c8dc57e9f7548ca9f8dd0740fbf0c658dc9/packages/flutter/lib/src/material/tabs.dart#L29
-  static const bottomHeight = 62.0;
-
-  @override
-  Size get preferredSize => const Size.fromHeight(topHeight + bottomHeight);
-
-  @override
-  Widget build(BuildContext context) {
-    return AppBar(
-      elevation: 1,
-      backgroundColor: Colors.white,
-      toolbarHeight: topHeight,
-      title: buildToolBar(context),
-      bottom: buildTabBar(),
-    );
-  }
-
-  PreferredSizeWidget buildTabBar() {
-    return const TabBar(
-      tabs: tabs,
-      labelColor: Colors.black,
-      unselectedLabelColor: Colors.black54,
-      indicatorColor: Colors.black,
-    );
-  }
-
-  Widget buildToolBar(BuildContext context) {
-    return SizedBox(
-      height: topHeight,
-      child: Row(
-        children: [
-          Expanded(child: buildSearchBox(context)),
-          const SizedBox(width: 16),
-          buildFilterButton(context),
-        ],
-      ),
-    );
-  }
-
-  Widget buildSearchBox(BuildContext context) {
-    final inputArea = Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('Where to?', style: Theme.of(context).textTheme.labelLarge),
-        const SizedBox(height: 4),
-        Text(
-          'Anywhere · Any week · Add guest',
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: Theme.of(
-            context,
-          ).textTheme.labelMedium?.copyWith(color: Colors.black54),
-        ),
-      ],
-    );
-
-    const decoration = ShapeDecoration(
-      color: Colors.white,
-      shape: StadiumBorder(side: BorderSide(color: Colors.black12)),
-      shadows: [
-        BoxShadow(
-          color: Color(0x0a000000),
-          spreadRadius: 4,
-          blurRadius: 8,
-          offset: Offset(1, 1),
-        ),
-      ],
-    );
-
-    return Container(
-      height: double.infinity,
-      margin: const EdgeInsets.symmetric(vertical: 12),
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      decoration: decoration,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          const Icon(Icons.search, color: Colors.black),
-          const SizedBox(width: 12),
-          Expanded(child: inputArea),
-        ],
-      ),
-    );
-  }
-
-  Widget buildFilterButton(BuildContext context) {
-    return IconButton(
-      onPressed: () {},
-      color: Colors.black,
-      icon: const Icon(Icons.tune_outlined),
-    );
-  }
-}
-
 class _BottomNavigationBar extends StatelessWidget {
   const _BottomNavigationBar();
 
@@ -375,11 +383,7 @@ class _BottomNavigationBar extends StatelessWidget {
         BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Explore'),
         BottomNavigationBarItem(
           icon: Icon(Icons.favorite_border_outlined),
-          label: 'Wishlists',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.luggage_outlined),
-          label: 'Trips',
+          label: 'LoveIt',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.inbox_outlined),
@@ -469,23 +473,21 @@ class _HouseCard extends StatelessWidget {
       ),
     ];
 
-    return InkWell(
-      onTap: () {},
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            image,
-            const SizedBox(height: 16),
-            heading,
-            const SizedBox(height: 8),
-            ...description,
-          ],
-        ),
+    return Padding(
+      // Removed InkWell and just use Padding
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          image,
+          const SizedBox(height: 16),
+          heading,
+          const SizedBox(height: 8),
+          ...description,
+        ],
       ),
     );
   }
 }
 
-final _houses = List.generate(50, (_) => _House.random());
+final _houses = List.generate(5, (_) => _House.random());

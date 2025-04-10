@@ -1,12 +1,6 @@
 import 'package:flutter/services.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-// import 'package:gdgdoc/screens/home/map_image.dart';
 import 'package:gdgdoc/screens/home/map_final.dart';
-import 'package:gdgdoc/screens/auth/login.dart';
-import 'package:gdgdoc/screens/home/splashscreen.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 // void main() {
 //   runApp(const MainApp());

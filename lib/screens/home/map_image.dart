@@ -34,17 +34,17 @@
 //     });
 //   }
 //
-//   void _handleSearch(String query) async {
-//     setState(() => _currentState = MapState.searching);
-//
-//     // Simulate API call
-//     await Future.delayed(const Duration(seconds: 1));
-//
-//     setState(() {
-//       _searchResults = _generateMockResults(query);
-//       _currentState = MapState.showingResults;
-//     });
-//   }
+  // void _handleSearch(String query) async {
+  //   setState(() => _currentState = MapState.searching);
+  //
+  //   // Simulate API call
+  //   await Future.delayed(const Duration(seconds: 1));
+  //
+  //   setState(() {
+  //     _searchResults = _generateMockResults(query);
+  //     _currentState = MapState.showingResults;
+  //   });
+  // }
 //
 //   List<MapLocation> _generateMockResults(String query) {
 //     return List.generate(
