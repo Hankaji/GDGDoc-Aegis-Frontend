@@ -1,5 +1,6 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
+import 'package:gdgdoc/screens/home/components/review_tab.dart';
 import 'package:gdgdoc/screens/home/map_final.dart';
 
 // void main() {
@@ -54,7 +55,7 @@ class _AirbnbMobileAppExample extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(useMaterial3: false),
-      home: const Home(),
+      home: const QuickTest(),
     );
   }
 }

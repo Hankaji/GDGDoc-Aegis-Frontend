@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:gdgdoc/screens/home/components/avatar.dart';
 import 'package:gdgdoc/screens/home/components/comment.dart';
@@ -34,7 +36,7 @@ class _ReviewTabState extends State<ReviewTab> {
       name: 'HandsomeChineseMan',
       comment:
           "This place is Absolute cinema, i can never get bored going to this place.",
-      time: "5 days",
+      time: DateTime(2025, 4, 10, 19, 55),
       rating: 5,
       auras: 4872,
       votes: 228922,
@@ -43,8 +45,8 @@ class _ReviewTabState extends State<ReviewTab> {
       imgUrl:
           'https://dragonball.guru/wp-content/uploads/2021/03/vegeta-profile-400x400.png',
       name: 'SwordSlasher',
-      comment: "His shlong is bigger than mine.",
-      time: "3 weeks",
+      comment: "His shlong is bigger than mine, would come again 3/5.",
+      time: DateTime(2025, 4, 10, 19, 56),
       rating: 3,
       auras: 127,
       votes: 316791,
@@ -54,7 +56,7 @@ class _ReviewTabState extends State<ReviewTab> {
               'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQnlMh-VQdsdzvvOJQPDHiQEsFGI7_pM_doLg&s',
           name: 'SwordSlasher2306',
           comment: "Skill issue",
-          time: "3 weeks",
+          time: DateTime(2025, 4, 10, 19, 56),
           isReply: true,
           rating: 3,
           auras: 997,
@@ -65,7 +67,7 @@ class _ReviewTabState extends State<ReviewTab> {
               'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRlv1uEukVNvXSKnZxP7yfbQt2RTqCY7hhoTA&s',
           name: 'BihAhDih',
           comment: "Ur jealous lol",
-          time: "3 weeks",
+          time: DateTime(2025, 4, 10, 19, 56),
           isReply: true,
           rating: 3,
           auras: 156,
@@ -77,8 +79,8 @@ class _ReviewTabState extends State<ReviewTab> {
       imgUrl:
           'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ-7GrrTHrY7rCTNuz97ZoGTX3W-ZNCMsZxow&s',
       name: 'Creeper2012',
-      comment: "2024 anyone?",
-      time: "a year",
+      comment: "This place isn't that good guys they lied to you.",
+      time: DateTime(2024, 4, 10, 19, 56, 0),
       rating: 1,
       auras: 8,
       votes: 23,
@@ -88,7 +90,7 @@ class _ReviewTabState extends State<ReviewTab> {
               'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRlv1uEukVNvXSKnZxP7yfbQt2RTqCY7hhoTA&s',
           name: 'BihAhDih',
           comment: "Shut up bro",
-          time: "2 years",
+          time: DateTime(2023, 4, 10, 19, 56, 0),
           isReply: true,
           rating: -1,
           auras: 156,
@@ -101,12 +103,31 @@ class _ReviewTabState extends State<ReviewTab> {
           'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTpmNskM4AGEpg1iIVAQ_n9nF_KaHJjgiuHiA&s',
       name: 'RealGoku',
       comment: "It's fun being here.",
-      time: "a week",
+      time: DateTime(2025, 4, 10, 19, 56, 0),
       rating: 5,
       auras: 999999,
       votes: 702569786109124,
     ),
   ];
+
+  void _analyzeComment() {
+    debugPrint("PLACEHOLDER: Send these comments to backend for auto tagging");
+
+    List<Map<String, dynamic>> reviews =
+        comments
+            .map(
+              (c) => {
+                'author_name': c.name,
+                'rating': c.rating,
+                'text': c.comment,
+                'time': c.time.millisecondsSinceEpoch,
+              },
+            )
+            .toList();
+
+    String jsonString = jsonEncode(reviews);
+    debugPrint(jsonString);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -125,10 +146,7 @@ class _ReviewTabState extends State<ReviewTab> {
         // WARNING: Placeholder button to demonstrate the auto-tagging feature
         // TODO: Delete this
         TextButton(
-          onPressed:
-              () => debugPrint(
-                "PLACEHOLDER: Send these comments to backend for auto tagging",
-              ),
+          onPressed: () => _analyzeComment(),
           style: TextButton.styleFrom(
             backgroundColor: Color(0xFFFF4B23),
             padding: EdgeInsets.symmetric(vertical: -16, horizontal: 0),

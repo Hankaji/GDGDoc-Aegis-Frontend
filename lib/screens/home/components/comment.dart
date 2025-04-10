@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:gdgdoc/screens/home/components/avatar.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 class Comment extends StatelessWidget {
   final String imgUrl;
   final String name;
   final String comment;
   final int votes;
-  final String time;
+  final DateTime time;
   final int auras;
   final int rating;
   final List<Comment>? replies;
@@ -71,7 +72,7 @@ class Comment extends StatelessWidget {
             "·",
             style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
           ),
-        Text("$time ago", style: TextStyle(fontSize: 10)),
+        Text(timeago.format(time), style: TextStyle(fontSize: 10)),
       ],
     );
   }
