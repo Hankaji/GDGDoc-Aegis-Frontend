@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:smooth_sheets/smooth_sheets.dart';
 import 'package:anim_search_bar/anim_search_bar.dart';
 
-class Home extends StatelessWidget {
-  const Home({super.key});
+class MapFinal extends StatelessWidget {
+  const MapFinal({super.key});
 
   @override
   Widget build(BuildContext context) {
