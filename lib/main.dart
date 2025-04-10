@@ -1,6 +1,5 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
-import 'package:gdgdoc/screens/home/map_final.dart';
 import 'package:gdgdoc/screens/home/splashscreen.dart';
 
 Future<void> main() async {

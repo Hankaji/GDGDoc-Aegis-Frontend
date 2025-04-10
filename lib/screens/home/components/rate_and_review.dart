@@ -28,7 +28,7 @@ class _RateAndReviewState extends State<RateAndReview> {
       name: "Teto",
       comment: comment,
       votes: 0,
-      time: "A few seconds",
+      time: DateTime.now(),
       auras: 401,
       rating: _selectedRating,
     );
