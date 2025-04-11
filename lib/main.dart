@@ -1,5 +1,11 @@
+import 'dart:convert';
+import 'dart:developer';
+
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
+import 'package:gdgdoc/domain/endpoints/location_endpoint.dart';
+import 'package:gdgdoc/domain/models/location.dart';
+import 'package:gdgdoc/screens/home/map_final.dart';
 import 'package:gdgdoc/screens/home/splashscreen.dart';
 import 'package:gdgdoc/screens/home/components/review_tab.dart';
 import 'package:gdgdoc/domain/api_service.dart';
@@ -9,7 +15,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // Lock the screen orientation to portrait.
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-  // printToConsole();
+  printToConsole();
 
   runApp(const _Home());
 }
@@ -21,21 +27,20 @@ class _Home extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(useMaterial3: false),
-      home: const Splashscreen(),
+      home: const MapFinal(),
     );
   }
 }
 
 // Example function to call and print location
-// Future<void> printToConsole() async {
-//   try {
-//     final locationData = await ApiService.get("locations");
-//     final reviews = await ReviewApi.getReviewsByLocationId(
-//       "7f61ef13-2474-431a-9c75-b3bde1afbb37",
-//     );
-//     print('Location data: $locationData');
-//     print('Reviews: $reviews');
-//   } catch (e) {
-//     print('Error fetching location: $e');
-//   }
-// }
+Future<void> printToConsole() async {
+  try {
+    final List<Location> locationData = await LocationApi.getLocations();
+    for (var ld in locationData) {
+      debugPrint('${ld.longitude} : ${ld.latitude}');
+    }
+  } catch (e) {
+    log('Error fetching location: $e');
+    throw (Exception(e));
+  }
+}
