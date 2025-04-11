@@ -21,14 +21,14 @@ class Location {
 
   factory Location.fromJson(Map<String, dynamic> json) {
     return Location(
-      id: json['id'],
-      googlePlaceId: json['google_place_id'],
-      name: json['name'],
-      address: json['address'],
+      id: json['id'] ?? '',
+      googlePlaceId: json['google_place_id'] ?? '',
+      name: json['name'] ?? '',
+      address: json['address'] ?? '',
       latitude: json['latitude']?.toDouble(),
       longitude: json['longitude']?.toDouble(),
-      createdAt: DateTime.parse(json['createdAt']),
-      updatedAt: DateTime.parse(json['updatedAt']),
+      createdAt: DateTime.parse(json['createdAt'] ?? ''),
+      updatedAt: DateTime.parse(json['updatedAt'] ?? ''),
     );
   }
 }
