@@ -253,7 +253,7 @@ class _ContentSheet extends StatefulWidget {
 }
 
 class _ContentSheetState extends State<_ContentSheet> {
-  _House? _selectedHouse;
+  Location? _selectedLocation; // Changed from _House to Location
 
   @override
   Widget build(BuildContext context) {
@@ -283,22 +283,24 @@ class _ContentSheetState extends State<_ContentSheet> {
               height: sheetHeight,
               child: Column(
                 children: [
-                  const _ContentSheetHandle(), // Your original handle
+                  const _ContentSheetHandle(),
                   Expanded(
                     child:
-                        _selectedHouse == null
-                            ? _HouseList(
-                              onHouseSelected:
-                                  (house) =>
-                                      setState(() => _selectedHouse = house),
+                        _selectedLocation == null
+                            ? _LocationList(
+                              onLocationSelected:
+                                  (location) => setState(
+                                    () => _selectedLocation = location,
+                                  ),
                             )
-                            : _HouseDetailView(
-                              house: _selectedHouse!,
+                            : _LocationDetailView(
+                              location: _selectedLocation!,
                               onBackPressed:
-                                  () => setState(() => _selectedHouse = null),
+                                  () =>
+                                      setState(() => _selectedLocation = null),
                             ),
                   ),
-                  const SizedBox(height: 125), // Extra space at bottom
+                  const SizedBox(height: 125),
                 ],
               ),
             ),
@@ -350,45 +352,78 @@ class _ContentSheetHandle extends StatelessWidget
   }
 }
 
-class _HouseList extends StatelessWidget {
-  const _HouseList({required this.onHouseSelected});
+class _LocationList extends StatefulWidget {
+  const _LocationList({required this.onLocationSelected});
 
-  final ValueChanged<_House> onHouseSelected;
+  final ValueChanged<Location> onLocationSelected;
+
+  @override
+  State<_LocationList> createState() => _LocationListState();
+}
+
+class _LocationListState extends State<_LocationList> {
+  late Future<List<Location>> _locationsFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _locationsFuture = _getLocations();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final result = ListView.builder(
-      padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
-      itemCount: _houses.length,
-      itemBuilder: (context, index) {
-        return GestureDetector(
-          onTap: () => onHouseSelected(_houses[index]),
-          child: _HouseCard(_houses[index]),
-        );
+    return FutureBuilder<List<Location>>(
+      future: _locationsFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+          return FadeTransition(
+            opacity: SheetOffsetDrivenAnimation(
+              controller: DefaultSheetController.of(context),
+              initialValue: 1,
+            ).drive(CurveTween(curve: Curves.easeOutCubic)),
+            child: ListView.builder(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).padding.bottom,
+              ),
+              itemCount: snapshot.data!.length,
+              itemBuilder: (context, index) {
+                final location = snapshot.data![index];
+                return GestureDetector(
+                  onTap: () => widget.onLocationSelected(location),
+                  child: _LocationCard(location),
+                );
+              },
+            ),
+          );
+        } else {
+          return const Center(child: Text('No locations found'));
+        }
       },
-    );
-
-    return FadeTransition(
-      opacity: SheetOffsetDrivenAnimation(
-        controller: DefaultSheetController.of(context),
-        initialValue: 1,
-      ).drive(CurveTween(curve: Curves.easeOutCubic)),
-      child: result,
     );
   }
 }
 
-class _HouseDetailView extends StatelessWidget {
-  const _HouseDetailView({required this.house, required this.onBackPressed});
+class _LocationDetailView extends StatelessWidget {
+  const _LocationDetailView({
+    required this.location,
+    required this.onBackPressed,
+  });
 
-  final _House house;
+  final Location location;
   final VoidCallback onBackPressed;
+
+  // Helper methods
+  String get _imageUrl => 'https://picsum.photos/600/400'; // Larger placeholder
+  // double get _rating => 4.5; // Fetch from API
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        // Keep the back button row fixed at the top
         Row(
           children: [
             IconButton(
@@ -398,15 +433,13 @@ class _HouseDetailView extends StatelessWidget {
             const Spacer(),
           ],
         ),
-        // Make only the content area scrollable
         Expanded(
           child: SingleChildScrollView(
-            physics: const ClampingScrollPhysics(), // Better for sheet behavior
+            physics: const ClampingScrollPhysics(),
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // House image
                 Container(
                   clipBehavior: Clip.antiAlias,
                   decoration: ShapeDecoration(
@@ -416,24 +449,23 @@ class _HouseDetailView extends StatelessWidget {
                   ),
                   child: AspectRatio(
                     aspectRatio: 1.2,
-                    child: Image.network(house.image, fit: BoxFit.cover),
+                    child: Image.network(_imageUrl, fit: BoxFit.cover),
                   ),
                 ),
                 const SizedBox(height: 16),
-                // House details
                 Text(
-                  house.title,
+                  location.name ?? 'Unnamed Location',
                   style: Theme.of(context).textTheme.headlineSmall,
                 ),
                 const SizedBox(height: 8),
-                Text('${house.distance} kilometers away'),
+                Text(location.address ?? 'Address not available'),
                 const SizedBox(height: 8),
-                Text(
-                  '\$${house.charge} total before taxes',
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
+                if (location.latitude != null && location.longitude != null)
+                  Text(
+                    'Coordinates: ${location.latitude}, ${location.longitude}',
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
                 const SizedBox(height: 24),
-                // Map section
                 const Text('Map', style: TextStyle(fontSize: 18)),
                 const SizedBox(height: 8),
                 Container(
@@ -447,11 +479,11 @@ class _HouseDetailView extends StatelessWidget {
                 ),
                 SingleChildScrollView(
                   child: Padding(
-                    padding: EdgeInsets.only(top: 20.0),
+                    padding: const EdgeInsets.only(top: 20.0),
                     child: ReviewTab(),
                   ),
                 ),
-                const SizedBox(height: 175), // Extra space at bottom
+                const SizedBox(height: 175),
               ],
             ),
           ),
@@ -459,32 +491,6 @@ class _HouseDetailView extends StatelessWidget {
       ],
     );
   }
-}
-
-class _House {
-  const _House({
-    required this.title,
-    required this.rating,
-    required this.distance,
-    required this.charge,
-    required this.image,
-  });
-
-  factory _House.random() {
-    return _House(
-      title: '${faker.address.city()}, ${faker.address.country()}',
-      rating: faker.randomGenerator.decimal(scale: 1.5, min: 3.5),
-      distance: faker.randomGenerator.integer(300, min: 50),
-      charge: faker.randomGenerator.integer(2000, min: 500),
-      image: faker.image.loremPicsum(width: 300, height: 300),
-    );
-  }
-
-  final String title;
-  final double rating;
-  final int distance;
-  final int charge;
-  final String image;
 }
 
 class _BottomNavigationBar extends StatelessWidget {
@@ -525,10 +531,15 @@ class _BottomNavigationBar extends StatelessWidget {
   }
 }
 
-class _HouseCard extends StatelessWidget {
-  const _HouseCard(this.house);
+class _LocationCard extends StatelessWidget {
+  const _LocationCard(this.location);
 
-  final _House house;
+  final Location location;
+
+  // Helper methods to maintain similar UI
+  double get _rating => 4.5; // You'll want to fetch this from your API
+  String get _imageUrl =>
+      'https://picsum.photos/300/300'; // Placeholder or use location image
 
   @override
   Widget build(BuildContext context) {
@@ -548,7 +559,7 @@ class _HouseCard extends StatelessWidget {
       ),
       child: AspectRatio(
         aspectRatio: 1.2,
-        child: Image.network(house.image, fit: BoxFit.fitWidth),
+        child: Image.network(_imageUrl, fit: BoxFit.fitWidth),
       ),
     );
 
@@ -557,7 +568,7 @@ class _HouseCard extends StatelessWidget {
       children: [
         Icon(Icons.star_rounded, color: secondaryTextStyle?.color, size: 18),
         const SizedBox(width: 4),
-        Text(house.rating.toStringAsFixed(1), style: secondaryTextStyle),
+        Text(_rating.toStringAsFixed(1), style: secondaryTextStyle),
       ],
     );
 
@@ -567,7 +578,7 @@ class _HouseCard extends StatelessWidget {
       children: [
         Expanded(
           child: Text(
-            house.title,
+            location.name ?? 'Unnamed Location',
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: primaryTextStyle,
@@ -579,20 +590,21 @@ class _HouseCard extends StatelessWidget {
     );
 
     final description = [
-      Text('${house.distance} kilometers away', style: tertiaryTextStyle),
-      const SizedBox(height: 4),
-      Text('5 nights · Jan 14 - 19', style: tertiaryTextStyle),
-      const SizedBox(height: 16),
       Text(
-        '\$${house.charge} total before taxes',
-        style: secondaryTextStyle?.copyWith(
-          decoration: TextDecoration.underline,
-        ),
+        location.address ?? 'Address not available',
+        style: tertiaryTextStyle,
       ),
+      const SizedBox(height: 4),
+      if (location.latitude != null && location.longitude != null)
+        Text(
+          'Coordinates: ${location.latitude!.toStringAsFixed(4)}, '
+          '${location.longitude!.toStringAsFixed(4)}',
+          style: tertiaryTextStyle,
+        ),
+      const SizedBox(height: 16),
     ];
 
     return Padding(
-      // Removed InkWell and just use Padding
       padding: const EdgeInsets.all(24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -607,5 +619,3 @@ class _HouseCard extends StatelessWidget {
     );
   }
 }
-
-final _houses = List.generate(5, (_) => _House.random());
