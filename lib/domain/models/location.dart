@@ -1,22 +1,22 @@
 class Location {
-  final String id;
+  final String? id;
   final String? googlePlaceId;
-  final String name;
-  final String address;
-  final double latitude;
-  final double longitude;
-  final DateTime createdAt;
-  final DateTime updatedAt;
+  final String? name;
+  final String? address;
+  final double? latitude;
+  final double? longitude;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
 
   Location({
-    required this.id,
+    this.id,
     this.googlePlaceId,
-    required this.name,
-    required this.address,
-    required this.latitude,
-    required this.longitude,
-    required this.createdAt,
-    required this.updatedAt,
+    this.name,
+    this.address,
+    this.latitude,
+    this.longitude,
+    this.createdAt,
+    this.updatedAt,
   });
 
   factory Location.fromJson(Map<String, dynamic> json) {
@@ -27,8 +27,8 @@ class Location {
       address: json['address'],
       latitude: json['latitude']?.toDouble(),
       longitude: json['longitude']?.toDouble(),
-      createdAt: DateTime.parse(json['created_at']),
-      updatedAt: DateTime.parse(json['updated_at']),
+      createdAt: DateTime.parse(json['createdAt']),
+      updatedAt: DateTime.parse(json['updatedAt']),
     );
   }
 }

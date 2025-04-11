@@ -1,8 +1,11 @@
+import 'dart:developer';
 import 'package:faker/faker.dart' hide Image, Color;
 import 'package:flutter/material.dart';
 import 'package:smooth_sheets/smooth_sheets.dart';
 import 'package:anim_search_bar/anim_search_bar.dart';
 import 'package:gdgdoc/screens/home/components/review_tab.dart';
+import 'package:gdgdoc/domain/models/location.dart';
+import 'package:gdgdoc/domain/endpoints/location_endpoint.dart';
 
 class MapFinal extends StatelessWidget {
   const MapFinal({super.key});
@@ -30,6 +33,17 @@ class MapFinal extends StatelessWidget {
   }
 }
 
+// Example function to call and print location
+Future<List<Location>> _getLocations() async {
+  try {
+    final List<Location> locationData = await LocationApi.getLocations();
+    return locationData;
+  } catch (e) {
+    log('Error fetching location: $e');
+    throw (Exception(e));
+  }
+}
+
 class _SearchBar extends StatefulWidget {
   @override
   _AppState createState() => _AppState();
@@ -49,7 +63,7 @@ class _AppState extends State<_SearchBar> {
         onSubmitted: (String query) async {
           // Simulate API call
           await Future.delayed(const Duration(seconds: 1));
-          print(query);
+          log(query);
         },
         width: 400,
         textController: textController,
@@ -124,7 +138,7 @@ class _Map extends StatelessWidget {
         maxScale: 4,
         child: Stack(
           fit: StackFit.passthrough,
-          children: [Image.asset('assets/fake_map.png', fit: BoxFit.contain)],
+          children: [Image.asset('assets/fake_map.jpeg', fit: BoxFit.contain)],
         ),
       ),
     );
