@@ -382,7 +382,9 @@ class _LocationDetailView extends StatelessWidget {
                 SingleChildScrollView(
                   child: Padding(
                     padding: const EdgeInsets.only(top: 20.0),
-                    child: ReviewTab(),
+                    child: ReviewTab(
+                      locationId: '7f61ef13-2474-431a-9c75-b3bde1afbb37',
+                    ),
                   ),
                 ),
                 const SizedBox(height: 175),

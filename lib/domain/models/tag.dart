@@ -15,8 +15,8 @@ class Tag {
     return Tag(
       id: json['id'],
       name: json['name'],
-      createdAt: DateTime.parse(json['createdAt']),
-      updatedAt: DateTime.parse(json['updatedAt']),
+      createdAt: DateTime.tryParse(json['created_at']) ?? DateTime.now(),
+      updatedAt: DateTime.tryParse(json['updated_at']) ?? DateTime.now(),
     );
   }
 }

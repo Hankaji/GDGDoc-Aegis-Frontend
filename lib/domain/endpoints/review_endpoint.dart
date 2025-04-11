@@ -6,6 +6,7 @@ class ReviewApi {
   static const String _baseUrl = 'http://localhost:8080/api/reviews';
 
   static Future<List<Review>> getReviewsByLocationId(String locationId) async {
+    print('$_baseUrl/by-location/$locationId');
     final response = await http.get(
       Uri.parse('$_baseUrl/by-location/$locationId'),
     );

@@ -24,8 +24,8 @@ class Review {
       userId: json['userId'],
       rating: json['rating'] ?? 0,
       comment: json['comment'] ?? '',
-      createdAt: DateTime.parse(json['createdAt']),
-      updatedAt: DateTime.parse(json['updatedAt']),
+      createdAt: DateTime.tryParse(json['createdAt']) ?? DateTime.now(),
+      updatedAt: DateTime.tryParse(json['updatedAt']) ?? DateTime.now(),
     );
   }
 }

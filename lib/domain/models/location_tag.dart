@@ -21,8 +21,8 @@ class LocationTag {
       locationId: json['location_id'],
       tagId: json['tag_id'],
       address: json['address'],
-      createdAt: DateTime.parse(json['created_at']),
-      updatedAt: DateTime.parse(json['updated_at']),
+      createdAt: DateTime.tryParse(json['created_at']) ?? DateTime.now(),
+      updatedAt: DateTime.tryParse(json['updated_at']) ?? DateTime.now(),
     );
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
+import 'package:gdgdoc/screens/home/map_final.dart';
 import 'package:gdgdoc/screens/home/splashscreen.dart';
 import 'package:gdgdoc/screens/home/components/review_tab.dart';
 import 'package:gdgdoc/domain/api_service.dart';
@@ -10,6 +11,7 @@ Future<void> main() async {
   // Lock the screen orientation to portrait.
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   // printToConsole();
+  print(DateTime.parse('2025-04-11T11:00:09.080Z'));
 
   runApp(const _Home());
 }
@@ -21,7 +23,7 @@ class _Home extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(useMaterial3: false),
-      home: const Splashscreen(),
+      home: const MapFinal(),
     );
   }
 }

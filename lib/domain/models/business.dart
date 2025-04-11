@@ -30,8 +30,8 @@ class Business {
       website: json['website'],
       phone: json['phone'],
       businessTypeId: json['business_type_id'],
-      createdAt: DateTime.parse(json['created_at']),
-      updatedAt: DateTime.parse(json['updated_at']),
+      createdAt: DateTime.tryParse(json['created_at']) ?? DateTime.now(),
+      updatedAt: DateTime.tryParse(json['updated_at']) ?? DateTime.now(),
     );
   }
 }
