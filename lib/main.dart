@@ -10,11 +10,11 @@ Future<void> main() async {
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   printToConsole();
 
-  runApp(const _AirbnbMobileAppExample());
+  runApp(const _Home());
 }
 
-class _AirbnbMobileAppExample extends StatelessWidget {
-  const _AirbnbMobileAppExample();
+class _Home extends StatelessWidget {
+  const _Home();
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
