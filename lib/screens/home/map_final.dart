@@ -2,6 +2,7 @@ import 'package:faker/faker.dart' hide Image, Color;
 import 'package:flutter/material.dart';
 import 'package:smooth_sheets/smooth_sheets.dart';
 import 'package:anim_search_bar/anim_search_bar.dart';
+import 'package:gdgdoc/screens/home/components/review_tab.dart';
 
 class MapFinal extends StatelessWidget {
   const MapFinal({super.key});
@@ -332,7 +333,12 @@ class _HouseDetailView extends StatelessWidget {
                   ),
                   child: const Icon(Icons.map, size: 50),
                 ),
-                // Add any additional content here
+                SingleChildScrollView(
+                  child: Padding(
+                    padding: EdgeInsets.only(top: 20.0),
+                    child: ReviewTab(),
+                  ),
+                ),
                 const SizedBox(height: 175), // Extra space at bottom
               ],
             ),
