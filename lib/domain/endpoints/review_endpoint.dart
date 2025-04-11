@@ -63,7 +63,7 @@ class ReviewApi {
         'comment': review.comment,
       }),
     );
-    if (response.statusCode == 201) {
+    if (response.statusCode == 200) {
       return Review.fromJson(json.decode(response.body));
     } else {
       throw Exception('Failed to create review');

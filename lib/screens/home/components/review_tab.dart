@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -7,19 +6,6 @@ import 'package:gdgdoc/domain/models/review.dart';
 import 'package:gdgdoc/domain/endpoints/review_endpoint.dart';
 import 'package:gdgdoc/screens/home/components/rate_and_review.dart';
 import 'package:percent_indicator/flutter_percent_indicator.dart';
-
-// class QuickTest extends StatelessWidget {
-//   const QuickTest({super.key});
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       body: SingleChildScrollView(
-//         child: Padding(padding: EdgeInsets.all(24), child: ReviewTab(locationId: )),
-//       ),
-//     );
-//   }
-// }
 
 class ReviewTab extends StatefulWidget {
   final String locationId;
@@ -34,70 +20,26 @@ class _ReviewTabState extends State<ReviewTab> {
     [],
   ); // Initialize immediately
 
+  void _fetchReviews() {
+    setState(() {
+      _reviewFuture = ReviewApi.getReviewsByLocationId(widget.locationId);
+    });
+  }
+
   @override
   void initState() {
     super.initState();
-    if (widget.locationId.isNotEmpty) {
-      _reviewFuture = ReviewApi.getReviewsByLocationId(widget.locationId);
-    }
+    _fetchReviews();
   }
 
-  void _analyzeComment(List<Review> reviews) {
-    debugPrint("PLACEHOLDER: Send these reviews to backend for auto tagging");
-
-    List<Map<String, dynamic>> reviewData =
-        reviews
-            .map(
-              (r) => {
-                'author_name': 'Pepepopo',
-                'rating': r.rating,
-                'text': r.comment,
-                'time': r.createdAt!.millisecondsSinceEpoch,
-              },
-            )
-            .toList();
-
-    String jsonString = jsonEncode(reviewData);
-    debugPrint(jsonString);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (widget.locationId.isEmpty) {
-      return const Center(child: Text('No location selected'));
-    }
-
-    return FutureBuilder<List<Review>>(
-      future: _reviewFuture,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        } else if (snapshot.hasError) {
-          return Center(child: Text('Error: ${snapshot.error}'));
-        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return const Center(child: Text('No reviews yet'));
-        }
-
-        return _buildReviewList(snapshot.data!);
-      },
-    );
-  }
-
-  Widget _buildReviewList(List<Review> reviews) {
+  Widget _buildReviewList(List<Review> reviews, String locationId) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       spacing: 12,
       children: [
-        _starRating(),
-        RateAndReview(
-          onCommentPosted: (newComment) {
-            // You'll need to adapt this to work with Review objects
-            // Or keep using Comment objects and convert between them
-          },
-        ),
         ...reviews.map((review) => _buildReviewItem(review)),
         TextButton(
-          onPressed: () => _analyzeComment(reviews),
+          onPressed: () {},
           style: TextButton.styleFrom(
             backgroundColor: Colors.orange,
             padding: const EdgeInsets.symmetric(vertical: -16, horizontal: 0),
@@ -129,6 +71,45 @@ class _ReviewTabState extends State<ReviewTab> {
       auras: Random().nextInt(10000000),
       rating: review.rating ?? 0,
       replies: getRandomReplies(),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        _starRating(),
+        RateAndReview(
+          onCommentPosted: (newComment) {
+            Review newReview = Review(
+              locationId: widget.locationId,
+              userId: '19404aa7-9baa-4642-b670-dcb9226fe8e5',
+              rating: newComment.rating,
+              comment: newComment.comment,
+            );
+
+            ReviewApi.createReview(newReview).then(
+              (_) => setState(() {
+                _fetchReviews();
+              }),
+            );
+          },
+        ),
+        FutureBuilder<List<Review>>(
+          future: _reviewFuture,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
+              return Center(child: Text('Error: ${snapshot.error}'));
+            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              return const Center(child: Text('No reviews yet'));
+            }
+
+            return _buildReviewList(snapshot.data!, widget.locationId);
+          },
+        ),
+      ],
     );
   }
 }

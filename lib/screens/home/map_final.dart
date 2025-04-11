@@ -1,16 +1,26 @@
+import 'package:anim_search_bar/anim_search_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:gdgdoc/constants/icons/map-pin.dart';
+import 'package:gdgdoc/domain/endpoints/location_endpoint.dart';
+import 'package:gdgdoc/domain/endpoints/review_endpoint.dart';
+import 'package:gdgdoc/domain/models/location.dart';
+import 'package:gdgdoc/domain/models/tag.dart';
+import 'package:gdgdoc/screens/home/components/review_tab.dart';
+import 'package:gdgdoc/screens/home/components/tags.dart';
 import 'package:gdgdoc/utils/lgn_lat.dart';
 import 'package:gdgdoc/utils/vec2.dart';
 import 'package:smooth_sheets/smooth_sheets.dart';
-import 'package:anim_search_bar/anim_search_bar.dart';
-import 'package:gdgdoc/screens/home/components/review_tab.dart';
-import 'package:gdgdoc/domain/models/location.dart';
-import 'package:gdgdoc/domain/endpoints/location_endpoint.dart';
-import 'package:gdgdoc/domain/endpoints/review_endpoint.dart';
+import 'package:vector_math/vector_math_64.dart' show Vector3;
 
-class MapFinal extends StatelessWidget {
+class MapFinal extends StatefulWidget {
   const MapFinal({super.key});
+
+  @override
+  State<MapFinal> createState() => _MapFinalState();
+}
+
+class _MapFinalState extends State<MapFinal> {
+  String tagFilter = '';
 
   @override
   Widget build(BuildContext context) {
@@ -22,8 +32,18 @@ class MapFinal extends StatelessWidget {
       body: Stack(
         children: [
           const _Map(),
-          _ContentSheet(systemUiInsets: systemUiInsets),
-          Positioned(top: 0, left: 16, right: 16, child: _SearchBar()),
+          _ContentSheet(systemUiInsets: systemUiInsets, tagFilter: tagFilter),
+          Positioned(
+            top: 0,
+            left: 16,
+            right: 16,
+            child: _SearchBar(
+              onSubmit:
+                  (filter) => setState(() {
+                    tagFilter = filter;
+                  }),
+            ),
+          ),
         ],
       ),
       bottomNavigationBar: const _BottomNavigationBar(),
@@ -47,6 +67,10 @@ Future<List<Location>> _getLocations() async {
 }
 
 class _SearchBar extends StatefulWidget {
+  Function(String)? onSubmit;
+
+  _SearchBar({this.onSubmit});
+
   @override
   _AppState createState() => _AppState();
 }
@@ -62,10 +86,11 @@ class _AppState extends State<_SearchBar> {
       /// In AnimSearchBar widget, the width, textController, onSuffixTap are required properties.
       /// You have also control over the suffixIcon, prefixIcon, helpText and animationDurationInMilli
       child: AnimSearchBar(
-        onSubmitted: (String query) async {
+        onSubmitted: (String query) {
           // Simulate API call
-          await Future.delayed(const Duration(seconds: 1));
+          // await Future.delayed(const Duration(seconds: 1));
           // log(query);
+          widget.onSubmit?.call(query);
         },
         width: 400,
         textController: textController,
@@ -127,7 +152,10 @@ class _MapButton extends StatelessWidget {
 }
 
 class _Map extends StatefulWidget {
-  const _Map();
+  final bool panable;
+  final Vec2? initialPosition;
+
+  const _Map({this.panable = true, this.initialPosition});
 
   @override
   State<_Map> createState() => _MapState();
@@ -135,23 +163,17 @@ class _Map extends StatefulWidget {
 
 class _MapState extends State<_Map> {
   List<Location> _locations = [];
-  final LatLng bottomRightLoc = LatLng(10.741071581787931, 106.7018617750684);
-  // // Benh vien dai hoc y duoc
-  // final LatLng daiHocYDuocLoc = LatLng(10.755794295243478, 106.66453485850542);
-  // // Chua van phat
-  // final LatLng chuaVanPhatLoc = LatLng(10.754107835070378, 106.67547827091565);
-  // // Chua van phat
-  // final LatLng bvNhiDongLoc = LatLng(10.769538593936689, 106.67011385306749);
-  final Vec2 mapSize = Vec2(2048, 1251);
+  static final LatLng bottomRightLoc = LatLng(
+    10.741071581787931,
+    106.7018617750684,
+  );
+  static final Vec2 mapSize = Vec2(2048, 1251);
 
-  Vec2 calculateRelativeMapPosition(LatLng target) {
+  static Vec2 calculateRelativeMapPosition(LatLng target) {
     double latitudeDifference = target.latitude - bottomRightLoc.latitude;
     double longitudeDifference = target.longitude - bottomRightLoc.longitude;
 
-    debugPrint(latitudeDifference.toString());
-    debugPrint(longitudeDifference.toString());
-
-    // Assuming a linear scale, adjust the scaling factors as needed
+    // Mapscale to correct positions
     Vec2 mapScale = Vec2(15.065, 24.65);
 
     double relativeX = longitudeDifference * mapScale.x * mapSize.x;
@@ -168,23 +190,25 @@ class _MapState extends State<_Map> {
         _locations = locDataList;
       }),
     );
-    // .then(
-    //   (locDataList) => locDataList.map(
-    //     (locData) => LatLng(locData.latitude!, locData.longitude!),
-    //   ),
-    // )
-    // .then(
-    //   (latLng) => setState(() {
-    //     _locations = latLng.toList();
-    //   }),
-    // );
   }
 
   @override
   Widget build(BuildContext context) {
     return SizedBox.expand(
       child: InteractiveViewer(
-        panEnabled: true,
+        transformationController:
+            widget.initialPosition != null
+                ? TransformationController(
+                  Matrix4.translation(
+                    Vector3(
+                      widget.initialPosition!.x,
+                      widget.initialPosition!.y,
+                      0,
+                    ),
+                  ),
+                )
+                : null,
+        panEnabled: widget.panable,
         scaleEnabled: true,
         constrained: false,
         minScale: 0.5,
@@ -212,7 +236,8 @@ class _MapState extends State<_Map> {
 }
 
 class _ContentSheet extends StatefulWidget {
-  const _ContentSheet({required this.systemUiInsets});
+  String? tagFilter;
+  _ContentSheet({required this.systemUiInsets, this.tagFilter});
 
   final EdgeInsets systemUiInsets;
 
@@ -260,6 +285,7 @@ class _ContentSheetState extends State<_ContentSheet> {
                                   (location) => setState(
                                     () => _selectedLocation = location,
                                   ),
+                              tagFilter: widget.tagFilter ?? '',
                             )
                             : _LocationDetailView(
                               location: _selectedLocation!,
@@ -321,7 +347,8 @@ class _ContentSheetHandle extends StatelessWidget
 }
 
 class _LocationList extends StatefulWidget {
-  const _LocationList({required this.onLocationSelected});
+  String tagFilter;
+  _LocationList({required this.onLocationSelected, this.tagFilter = ''});
 
   final ValueChanged<Location> onLocationSelected;
 
@@ -348,6 +375,19 @@ class _LocationListState extends State<_LocationList> {
         } else if (snapshot.hasError) {
           return Center(child: Text('Error: ${snapshot.error}'));
         } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+          List<Location> filteredLocations =
+              snapshot.data!.where((location) {
+                for (Tag tag in location.tags!) {
+                  if (widget.tagFilter.isEmpty ||
+                      tag.name.toLowerCase().contains(
+                        widget.tagFilter.toLowerCase(),
+                      )) {
+                    return true;
+                  }
+                }
+                return false;
+              }).toList();
+
           return FadeTransition(
             opacity: SheetOffsetDrivenAnimation(
               controller: DefaultSheetController.of(context),
@@ -357,9 +397,9 @@ class _LocationListState extends State<_LocationList> {
               padding: EdgeInsets.only(
                 bottom: MediaQuery.of(context).padding.bottom,
               ),
-              itemCount: snapshot.data!.length,
+              itemCount: filteredLocations.length,
               itemBuilder: (context, index) {
-                final location = snapshot.data![index];
+                final location = filteredLocations[index];
                 return GestureDetector(
                   onTap: () => widget.onLocationSelected(location),
                   child: _LocationCard(location),
@@ -390,6 +430,14 @@ class _LocationDetailView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Vec2 locationRelativePos = _MapState.calculateRelativeMapPosition(
+      LatLng(location.latitude!, location.longitude!),
+    );
+    Vec2 locationRelativePosFromTopLeft = Vec2(
+      locationRelativePos.x - (-_MapState.mapSize.x) - 240,
+      locationRelativePos.y - _MapState.mapSize.y + 120,
+    );
+
     return Column(
       children: [
         Row(
@@ -412,12 +460,16 @@ class _LocationDetailView extends StatelessWidget {
                   clipBehavior: Clip.antiAlias,
                   decoration: ShapeDecoration(
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(12),
                     ),
                   ),
                   child: AspectRatio(
                     aspectRatio: 1.2,
-                    child: Image.network(_imageUrl, fit: BoxFit.cover),
+                    child: Image.network(
+                      location.thumbnailImage!,
+                      fit: BoxFit.cover,
+                    ),
+                    // child: Image.network(_imageUrl, fit: BoxFit.cover),
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -428,22 +480,35 @@ class _LocationDetailView extends StatelessWidget {
                 const SizedBox(height: 8),
                 Text(location.address ?? 'Address not available'),
                 const SizedBox(height: 8),
-                if (location.latitude != null && location.longitude != null)
-                  Text(
-                    'Coordinates: ${location.latitude}, ${location.longitude}',
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                const SizedBox(height: 24),
+                Tags(tagNames: location.tags ?? []),
+                // if (location.latitude != null && location.longitude != null)
+                //   Text(
+                //     'Coordinates: ${location.latitude}, ${location.longitude}',
+                //     style: const TextStyle(fontWeight: FontWeight.bold),
+                //   ),
+                const SizedBox(height: 16),
                 const Text('Map', style: TextStyle(fontSize: 18)),
                 const SizedBox(height: 8),
+                // ------------------------- Mini Map image -------------------------
                 Container(
                   height: 150,
+                  clipBehavior: Clip.hardEdge,
                   width: MediaQuery.sizeOf(context).width,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12),
                     color: Colors.grey[200],
                   ),
-                  child: const Icon(Icons.map, size: 50),
+                  // child: const Icon(Icons.map, size: 50),
+                  child: OverflowBox(
+                    alignment: Alignment.center,
+                    child: _Map(
+                      panable: false,
+                      initialPosition: Vec2(
+                        -locationRelativePosFromTopLeft.x,
+                        locationRelativePosFromTopLeft.y,
+                      ),
+                    ),
+                  ),
                 ),
                 SingleChildScrollView(
                   child: Padding(
@@ -522,13 +587,15 @@ class _LocationCard extends StatelessWidget {
     );
 
     final image = Container(
-      clipBehavior: Clip.antiAlias,
+      clipBehavior: Clip.hardEdge,
       decoration: ShapeDecoration(
+        // color: Colors.red,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       ),
       child: AspectRatio(
-        aspectRatio: 1.2,
-        child: Image.network(_imageUrl, fit: BoxFit.fitWidth),
+        aspectRatio: 1.8,
+        child: Image.network(location.thumbnailImage!, fit: BoxFit.cover),
+        // child: Image.network(_imageUrl, fit: BoxFit.fitWidth),
       ),
     );
 
@@ -538,8 +605,8 @@ class _LocationCard extends StatelessWidget {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const SizedBox(
-            width: 40,
-            height: 20,
+            width: 24,
+            height: 24,
             child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
           );
         }
@@ -552,13 +619,10 @@ class _LocationCard extends StatelessWidget {
         return Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              Icons.star_rounded,
-              color: secondaryTextStyle?.color,
-              size: 18,
-            ),
+            Icon(Icons.star_rounded, color: Color(0xFFFFB53F), size: 18),
             const SizedBox(width: 4),
             Text(ratingValue.toStringAsFixed(1), style: secondaryTextStyle),
+            const SizedBox(width: 8),
           ],
         );
       },
@@ -576,7 +640,6 @@ class _LocationCard extends StatelessWidget {
             style: primaryTextStyle,
           ),
         ),
-        const SizedBox(width: 8),
         rating, // Use the FutureBuilder here
       ],
     );
@@ -586,27 +649,15 @@ class _LocationCard extends StatelessWidget {
         location.address ?? 'Address not available',
         style: tertiaryTextStyle,
       ),
-      const SizedBox(height: 4),
-      if (location.latitude != null && location.longitude != null)
-        Text(
-          'Coordinates: ${location.latitude!.toStringAsFixed(4)}, '
-          '${location.longitude!.toStringAsFixed(4)}',
-          style: tertiaryTextStyle,
-        ),
-      const SizedBox(height: 16),
+      Tags(tagNames: location.tags ?? []),
     ];
 
     return Padding(
       padding: const EdgeInsets.all(24),
       child: Column(
+        spacing: 8,
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          image,
-          const SizedBox(height: 16),
-          heading,
-          const SizedBox(height: 8),
-          ...description,
-        ],
+        children: [image, heading, ...description],
       ),
     );
   }
