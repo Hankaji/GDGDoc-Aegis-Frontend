@@ -22,7 +22,7 @@ class Location {
   factory Location.fromJson(Map<String, dynamic> json) {
     return Location(
       id: json['id'],
-      googlePlaceId: json['google_place_id'],
+      // googlePlaceId: json['google_place_id'],
       name: json['name'],
       address: json['address'],
       latitude: json['latitude']?.toDouble(),
