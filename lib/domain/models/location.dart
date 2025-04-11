@@ -1,5 +1,5 @@
 class Location {
-  final String? id;
+  final String id;
   final String? googlePlaceId;
   final String? name;
   final String? address;
@@ -7,7 +7,7 @@ class Location {
   final double? longitude;
 
   Location({
-    this.id,
+    required this.id,
     this.googlePlaceId,
     this.name,
     this.address,

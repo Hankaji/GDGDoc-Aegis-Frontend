@@ -24,7 +24,7 @@ class ReviewApi {
   static Future<double> getAvgRatingByLocationId(String locationId) async {
     try {
       final response = await http.get(
-        Uri.parse('$_baseUrl/locations/$locationId/average-rating'),
+        Uri.parse('$_baseUrl/average-rating/$locationId'),
         headers: {'Content-Type': 'application/json'},
       );
 

@@ -14,7 +14,7 @@ class MapPinIcon extends StatelessWidget {
     super.key,
     this.size = 24,
     this.color,
-    this.locationName = 'TESTkjhgfdaskhjgfdsakhjgdfsjkhfsd',
+    this.locationName = 'qwertyuiop1234567890',
     this.shadowColor = Colors.black45,
     this.shadowHeight = 4.0,
     this.shadowSpread = 0.5,
@@ -23,13 +23,13 @@ class MapPinIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FractionalTranslation(
-      translation: Offset(0.5, 0),
+      translation: const Offset(0.5, 0),
       child: Stack(
         alignment: Alignment.bottomCenter,
         children: [
-          // The shadow (positioned at bottom)
+          // Shadow (unchanged)
           Transform.translate(
-            offset: Offset(0, 0), // Slight vertical offset
+            offset: const Offset(0, 0),
             child: Container(
               width: size * shadowSpread,
               height: size * 0.1,
@@ -46,51 +46,37 @@ class MapPinIcon extends StatelessWidget {
               ),
             ),
           ),
-          // The actual pin icon
+          // Pin with text box
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
-            spacing: 4,
             children: [
-              // Text + TextStroke
               if (locationName != null)
-                Stack(
-                  children: [
-                    Text(
-                      locationName!,
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        foreground:
-                            Paint()
-                              ..style = PaintingStyle.stroke
-                              ..strokeWidth = 4
-                              ..color = Colors.white,
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.7),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
                       ),
-                    ),
-                    GradientText(
-                      locationName!,
-                      colors: [Color(0xFFE36658), Color(0xFFD87297)],
-                      gradientDirection: GradientDirection.ltr,
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        // foreground:
-                        //     Paint()
-                        //       ..style = PaintingStyle.stroke
-                        //       ..strokeWidth = 0
-                        //       ..color = Colors.white,
-                        shadows: [
-                          BoxShadow(
-                            color: shadowColor,
-                            blurRadius: 4,
-                            offset: Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+                    ],
+                    border: Border.all(color: Colors.grey.shade300, width: 1),
+                  ),
+                  child: GradientText(
+                    locationName!,
+                    colors: const [Color(0xFFE36658), Color(0xFFD87297)],
+                    gradientDirection: GradientDirection.ltr,
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
                 ),
+              const SizedBox(height: 8), // Space between text and pin
               SvgPicture.asset(
                 'assets/map-pin-icon.svg',
                 semanticsLabel: 'Map Pin',

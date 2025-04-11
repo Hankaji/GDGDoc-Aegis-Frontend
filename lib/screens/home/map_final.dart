@@ -1,8 +1,4 @@
-import 'dart:developer';
-import 'dart:math';
-import 'package:faker/faker.dart' hide Image, Color;
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gdgdoc/constants/icons/map-pin.dart';
 import 'package:gdgdoc/utils/lgn_lat.dart';
 import 'package:gdgdoc/utils/vec2.dart';
@@ -11,6 +7,7 @@ import 'package:anim_search_bar/anim_search_bar.dart';
 import 'package:gdgdoc/screens/home/components/review_tab.dart';
 import 'package:gdgdoc/domain/models/location.dart';
 import 'package:gdgdoc/domain/endpoints/location_endpoint.dart';
+import 'package:gdgdoc/domain/endpoints/review_endpoint.dart';
 
 class MapFinal extends StatelessWidget {
   const MapFinal({super.key});
@@ -139,36 +136,13 @@ class _Map extends StatefulWidget {
 class _MapState extends State<_Map> {
   List<Location> _locations = [];
   final LatLng bottomRightLoc = LatLng(10.741071581787931, 106.7018617750684);
-  // Benh vien dai hoc y duoc
-  final LatLng daiHocYDuocLoc = LatLng(10.755794295243478, 106.66453485850542);
-  // Chua van phat
-  final LatLng chuaVanPhatLoc = LatLng(10.754107835070378, 106.67547827091565);
-  // Chua van phat
-  final LatLng bvNhiDongLoc = LatLng(10.769538593936689, 106.67011385306749);
+  // // Benh vien dai hoc y duoc
+  // final LatLng daiHocYDuocLoc = LatLng(10.755794295243478, 106.66453485850542);
+  // // Chua van phat
+  // final LatLng chuaVanPhatLoc = LatLng(10.754107835070378, 106.67547827091565);
+  // // Chua van phat
+  // final LatLng bvNhiDongLoc = LatLng(10.769538593936689, 106.67011385306749);
   final Vec2 mapSize = Vec2(2048, 1251);
-
-  static const double earthRadius = 6371000; // Earth radius in meters
-
-  static double degreesToRadians(double degrees) {
-    return degrees * pi / 180;
-  }
-
-  static double calculateDistance(LatLng pos1, LatLng pos2) {
-    double lat1 = degreesToRadians(pos1.latitude);
-    double lon1 = degreesToRadians(pos1.longitude);
-    double lat2 = degreesToRadians(pos2.latitude);
-    double lon2 = degreesToRadians(pos2.longitude);
-
-    double dLat = lat2 - lat1;
-    double dLon = lon2 - lon1;
-
-    double a =
-        sin(dLat / 2) * sin(dLat / 2) +
-        cos(lat1) * cos(lat2) * sin(dLon / 2) * sin(dLon / 2);
-    double c = 2 * atan2(sqrt(a), sqrt(1 - a));
-
-    return earthRadius * c; // Distance in meters
-  }
 
   Vec2 calculateRelativeMapPosition(LatLng target) {
     double latitudeDifference = target.latitude - bottomRightLoc.latitude;
@@ -184,12 +158,6 @@ class _MapState extends State<_Map> {
     double relativeY = latitudeDifference * mapScale.y * mapSize.y;
 
     return Vec2(relativeX, relativeY);
-  }
-
-  static LatLng calculateLatLongDifference(LatLng target, LatLng bottomRight) {
-    double longitudeDifference = target.longitude - bottomRight.longitude;
-    double latitudeDifference = target.latitude - bottomRight.latitude;
-    return LatLng(latitudeDifference, longitudeDifference);
   }
 
   @override
@@ -233,7 +201,7 @@ class _MapState extends State<_Map> {
               return Positioned(
                 bottom: relativePosition.y,
                 right: -relativePosition.x,
-                child: MapPinIcon(size: 36),
+                child: MapPinIcon(locationName: loc.name, size: 42),
               );
             }),
           ],
@@ -480,9 +448,7 @@ class _LocationDetailView extends StatelessWidget {
                 SingleChildScrollView(
                   child: Padding(
                     padding: const EdgeInsets.only(top: 20.0),
-                    child: ReviewTab(
-                      locationId: '7f61ef13-2474-431a-9c75-b3bde1afbb37',
-                    ),
+                    child: ReviewTab(locationId: location.id),
                   ),
                 ),
                 const SizedBox(height: 175),
@@ -538,10 +504,11 @@ class _LocationCard extends StatelessWidget {
 
   final Location location;
 
-  // Helper methods to maintain similar UI
-  double get _rating => 4.5; // You'll want to fetch this from your API
-  String get _imageUrl =>
-      'https://picsum.photos/300/300'; // Placeholder or use location image
+  // Replace the hardcoded rating with a Future
+  Future<double> get _ratingFuture =>
+      ReviewApi.getAvgRatingByLocationId(location.id);
+
+  String get _imageUrl => 'https://picsum.photos/300/300';
 
   @override
   Widget build(BuildContext context) {
@@ -565,13 +532,36 @@ class _LocationCard extends StatelessWidget {
       ),
     );
 
-    final rating = Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(Icons.star_rounded, color: secondaryTextStyle?.color, size: 18),
-        const SizedBox(width: 4),
-        Text(_rating.toStringAsFixed(1), style: secondaryTextStyle),
-      ],
+    // Create a FutureBuilder for the rating
+    final rating = FutureBuilder<double>(
+      future: _ratingFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const SizedBox(
+            width: 40,
+            height: 20,
+            child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+          );
+        }
+
+        if (snapshot.hasError) {
+          return const Icon(Icons.error_outline, size: 18, color: Colors.red);
+        }
+
+        final ratingValue = snapshot.data ?? 0.0;
+        return Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.star_rounded,
+              color: secondaryTextStyle?.color,
+              size: 18,
+            ),
+            const SizedBox(width: 4),
+            Text(ratingValue.toStringAsFixed(1), style: secondaryTextStyle),
+          ],
+        );
+      },
     );
 
     final heading = Row(
@@ -587,7 +577,7 @@ class _LocationCard extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 8),
-        rating,
+        rating, // Use the FutureBuilder here
       ],
     );
 
