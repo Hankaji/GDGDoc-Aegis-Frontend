@@ -7,10 +7,13 @@ class LocationApi {
 
   static Future<List<Location>> getLocations() async {
     final response = await http.get(Uri.parse(_baseUrl));
+
     if (response.statusCode == 200) {
-      return (json.decode(response.body) as List)
-          .map((location) => Location.fromJson(location))
-          .toList();
+      // Decode the raw bytes to ensure UTF-8 handling
+      final decodedBody = utf8.decode(response.bodyBytes);
+      final List<dynamic> jsonData = json.decode(decodedBody);
+
+      return jsonData.map((location) => Location.fromJson(location)).toList();
     } else {
       throw Exception('Failed to load locations');
     }

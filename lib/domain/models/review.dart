@@ -22,8 +22,8 @@ class Review {
       id: json['id'],
       locationId: json['locationId'],
       userId: json['userId'],
-      rating: json['rating'],
-      comment: json['comment'],
+      rating: json['rating'] ?? 0,
+      comment: json['comment'] ?? '',
       createdAt: DateTime.parse(json['createdAt']),
       updatedAt: DateTime.parse(json['updatedAt']),
     );

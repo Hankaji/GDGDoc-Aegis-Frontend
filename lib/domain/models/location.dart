@@ -5,8 +5,6 @@ class Location {
   final String? address;
   final double? latitude;
   final double? longitude;
-  final DateTime? createdAt;
-  final DateTime? updatedAt;
 
   Location({
     this.id,
@@ -15,8 +13,6 @@ class Location {
     this.address,
     this.latitude,
     this.longitude,
-    this.createdAt,
-    this.updatedAt,
   });
 
   factory Location.fromJson(Map<String, dynamic> json) {
@@ -27,8 +23,6 @@ class Location {
       address: json['address'] ?? '',
       latitude: json['latitude']?.toDouble(),
       longitude: json['longitude']?.toDouble(),
-      createdAt: DateTime.parse(json['createdAt'] ?? ''),
-      updatedAt: DateTime.parse(json['updatedAt'] ?? ''),
     );
   }
 }
