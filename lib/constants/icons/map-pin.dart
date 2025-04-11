@@ -23,7 +23,7 @@ class MapPinIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FractionalTranslation(
-      translation: Offset(0.3, -0.25),
+      translation: Offset(0.5, 0),
       child: Stack(
         alignment: Alignment.bottomCenter,
         children: [

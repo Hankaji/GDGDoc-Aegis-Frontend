@@ -178,7 +178,7 @@ class _MapState extends State<_Map> {
     debugPrint(longitudeDifference.toString());
 
     // Assuming a linear scale, adjust the scaling factors as needed
-    Vec2 mapScale = Vec2(14.8, 24.3);
+    Vec2 mapScale = Vec2(15.065, 24.65);
 
     double relativeX = longitudeDifference * mapScale.x * mapSize.x;
     double relativeY = latitudeDifference * mapScale.y * mapSize.y;
