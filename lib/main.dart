@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/services.dart';
@@ -35,8 +36,9 @@ class _Home extends StatelessWidget {
 Future<void> printToConsole() async {
   try {
     final List<Location> locationData = await LocationApi.getLocations();
-    debugPrint(locationData.toString());
-    // return locationData;
+    for (var ld in locationData) {
+      debugPrint('${ld.longitude} : ${ld.latitude}');
+    }
   } catch (e) {
     log('Error fetching location: $e');
     throw (Exception(e));

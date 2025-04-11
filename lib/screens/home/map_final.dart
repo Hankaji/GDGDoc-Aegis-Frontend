@@ -1,6 +1,11 @@
 import 'dart:developer';
+import 'dart:math';
 import 'package:faker/faker.dart' hide Image, Color;
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:gdgdoc/constants/icons/map-pin.dart';
+import 'package:gdgdoc/utils/lgn_lat.dart';
+import 'package:gdgdoc/utils/vec2.dart';
 import 'package:smooth_sheets/smooth_sheets.dart';
 import 'package:anim_search_bar/anim_search_bar.dart';
 import 'package:gdgdoc/screens/home/components/review_tab.dart';
@@ -39,7 +44,7 @@ Future<List<Location>> _getLocations() async {
     final List<Location> locationData = await LocationApi.getLocations();
     return locationData;
   } catch (e) {
-    log('Error fetching location: $e');
+    // log('Error fetching location: $e');
     throw (Exception(e));
   }
 }
@@ -63,7 +68,7 @@ class _AppState extends State<_SearchBar> {
         onSubmitted: (String query) async {
           // Simulate API call
           await Future.delayed(const Duration(seconds: 1));
-          log(query);
+          // log(query);
         },
         width: 400,
         textController: textController,
@@ -124,8 +129,88 @@ class _MapButton extends StatelessWidget {
   }
 }
 
-class _Map extends StatelessWidget {
+class _Map extends StatefulWidget {
   const _Map();
+
+  @override
+  State<_Map> createState() => _MapState();
+}
+
+class _MapState extends State<_Map> {
+  List<Location> _locations = [];
+  final LatLng bottomRightLoc = LatLng(10.741071581787931, 106.7018617750684);
+  // Benh vien dai hoc y duoc
+  final LatLng daiHocYDuocLoc = LatLng(10.755794295243478, 106.66453485850542);
+  // Chua van phat
+  final LatLng chuaVanPhatLoc = LatLng(10.754107835070378, 106.67547827091565);
+  // Chua van phat
+  final LatLng bvNhiDongLoc = LatLng(10.769538593936689, 106.67011385306749);
+  final Vec2 mapSize = Vec2(2048, 1251);
+
+  static const double earthRadius = 6371000; // Earth radius in meters
+
+  static double degreesToRadians(double degrees) {
+    return degrees * pi / 180;
+  }
+
+  static double calculateDistance(LatLng pos1, LatLng pos2) {
+    double lat1 = degreesToRadians(pos1.latitude);
+    double lon1 = degreesToRadians(pos1.longitude);
+    double lat2 = degreesToRadians(pos2.latitude);
+    double lon2 = degreesToRadians(pos2.longitude);
+
+    double dLat = lat2 - lat1;
+    double dLon = lon2 - lon1;
+
+    double a =
+        sin(dLat / 2) * sin(dLat / 2) +
+        cos(lat1) * cos(lat2) * sin(dLon / 2) * sin(dLon / 2);
+    double c = 2 * atan2(sqrt(a), sqrt(1 - a));
+
+    return earthRadius * c; // Distance in meters
+  }
+
+  Vec2 calculateRelativeMapPosition(LatLng target) {
+    double latitudeDifference = target.latitude - bottomRightLoc.latitude;
+    double longitudeDifference = target.longitude - bottomRightLoc.longitude;
+
+    debugPrint(latitudeDifference.toString());
+    debugPrint(longitudeDifference.toString());
+
+    // Assuming a linear scale, adjust the scaling factors as needed
+    Vec2 mapScale = Vec2(14.8, 24.3);
+
+    double relativeX = longitudeDifference * mapScale.x * mapSize.x;
+    double relativeY = latitudeDifference * mapScale.y * mapSize.y;
+
+    return Vec2(relativeX, relativeY);
+  }
+
+  static LatLng calculateLatLongDifference(LatLng target, LatLng bottomRight) {
+    double longitudeDifference = target.longitude - bottomRight.longitude;
+    double latitudeDifference = target.latitude - bottomRight.latitude;
+    return LatLng(latitudeDifference, longitudeDifference);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _getLocations().then(
+      (locDataList) => setState(() {
+        _locations = locDataList;
+      }),
+    );
+    // .then(
+    //   (locDataList) => locDataList.map(
+    //     (locData) => LatLng(locData.latitude!, locData.longitude!),
+    //   ),
+    // )
+    // .then(
+    //   (latLng) => setState(() {
+    //     _locations = latLng.toList();
+    //   }),
+    // );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -138,7 +223,20 @@ class _Map extends StatelessWidget {
         maxScale: 4,
         child: Stack(
           fit: StackFit.passthrough,
-          children: [Image.asset('assets/fake_map.jpeg', fit: BoxFit.contain)],
+          children: [
+            Image.asset('assets/fake_map.jpeg', fit: BoxFit.contain),
+
+            ..._locations.map((loc) {
+              LatLng locLatLng = LatLng(loc.latitude!, loc.longitude!);
+              Vec2 relativePosition = calculateRelativeMapPosition(locLatLng);
+
+              return Positioned(
+                bottom: relativePosition.y,
+                right: -relativePosition.x,
+                child: MapPinIcon(size: 36),
+              );
+            }),
+          ],
         ),
       ),
     );

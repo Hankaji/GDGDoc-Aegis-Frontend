@@ -27,8 +27,8 @@ class Location {
       address: json['address'] ?? '',
       latitude: json['latitude']?.toDouble(),
       longitude: json['longitude']?.toDouble(),
-      createdAt: DateTime.parse(json['createdAt']),
-      updatedAt: DateTime.parse(json['updatedAt']),
+      // createdAt: DateTime.parse(json['createdAt']),
+      // updatedAt: DateTime.parse(json['updatedAt']),
     );
   }
 }
