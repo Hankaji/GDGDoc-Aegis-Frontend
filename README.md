@@ -1,4 +1,4 @@
-# 📱 Flutter Project Name
+# 📱 ÆGis
 
 Aegis is a Flutter application designed to empower gay and marginalized communities by providing a platform to discover safe and supportive locations. Whether you're looking for LGBTQ+ friendly businesses, community centers, or other welcoming spaces, Aegis helps you find places where you can feel at home.
 
