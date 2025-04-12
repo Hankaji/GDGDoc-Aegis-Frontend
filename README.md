@@ -47,9 +47,29 @@ BE_ENDPOINT=http://127.0.0.1:8080/api
 
 Other ways of running the app (e.g native android build), you might have to provide a different enpoint url.
 
+For native mobile build, change the IP_Address to your device's IP address where backend is hosted.
+
 ```sh
 BE_ENDPOINT=http://<IP_Address>:8080/api
 ```
+
+<details>
+   <summary>Finding IP address</summary>
+   
+   ## Windows
+      
+   Run `ipconfig /all` in Cmd and scroll down to your current WiFi connection and you will see your PC's IPv4 address 
+
+   ## Linux
+      
+   Run `ifconfig` in terminal and look for your inet <IPv4> in network device (e.g wlan0)
+   
+
+   ## MacOs
+      
+   Run `ipconfig getifaddr en0` in terminal, what returned is your device private IPv4 address
+   
+</details>
 
 ## 🏗️ Project Structure
 
