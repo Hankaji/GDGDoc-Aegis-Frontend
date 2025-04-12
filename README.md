@@ -33,8 +33,8 @@ To get started with this project, follow these steps:
 > ⚠️ **Important Note**
 > 
 > In order to have a proper local working system, a backend and AI must be running as well, please check their documentation for instruction on how to set up locally:
-> - [backend](https://github.com/DankoFox/aegis-backend) - Required for data communication and AI integration
-> - [AI](https://github.com/nmquan1/aegis-pipeline)  – Required for AI Analysis
+> - [🖥️ backend](https://github.com/DankoFox/aegis-backend) - Required for data communication and AI integration
+> - [🧠 AI](https://github.com/nmquan1/aegis-pipeline)  – Required for AI Analysis
 >
 > For the best experience, it is recommended to run all 3 systems locally (As this is only a MVP) within the same local network and with a native build of Flutter on corresponding system, other builds of flutter program should work but require slight changes in the endpoint url, as depicted below. 
 
