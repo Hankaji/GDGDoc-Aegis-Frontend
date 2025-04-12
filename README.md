@@ -31,6 +31,9 @@ To get started with this project, follow these steps:
    flutter run
    ```
 
+
+> Warning: In order to have a proper local working system, a back-end and AI must be running as well, check their documentation for instruction on how to set up them.
+
 ## 🏗️ Project Structure
 
 ```sh
