@@ -45,6 +45,10 @@ BE_ENDPOINT=http://127.0.0.1:8080/api
 
 Other ways of running the app (e.g native android build), you might have to provide a different enpoint url.
 
+```sh
+BE_ENDPOINT=http://<IP_Address>:8080/api
+```
+
 ## 🏗️ Project Structure
 
 ```sh
